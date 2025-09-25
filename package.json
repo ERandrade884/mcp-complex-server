@@ -2,18 +2,25 @@
   "name": "mcp-complex-server",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "type": "module",
+  "main": "server.mjs",
   "scripts": {
+    "start": "tsx server.ts",
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-      "@modelcontextprotocol/sdk": "^1.18.1",
-      "sqlite3": "^5.1.7",
-      "synaptic": "^1.1.4",
-      "zod": "^3.25.76",
-      "natural": "^8.1.0"
-    }
+    "@modelcontextprotocol/sdk": "^1.18.1",
+    "natural": "^8.1.0",
+    "sqlite3": "^5.1.7",
+    "synaptic": "^1.1.4",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2"
+  }
 }
