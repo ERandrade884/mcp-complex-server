@@ -21,7 +21,9 @@ function callTool(serverProcess, toolName, args = {}, requestId) {
   return new Promise((resolve, reject) => {
     let buffer = '';
     const onData = (data) => {
-      buffer += data.toString();
+      const chunk = data.toString();
+      console.log('Raw server output:', chunk); // Debug raw
+      buffer += chunk;
       const lines = buffer.split('\n');
       buffer = lines.pop() || '';
       for (const line of lines) {
@@ -33,7 +35,7 @@ function callTool(serverProcess, toolName, args = {}, requestId) {
               resolve(response.result || response);
             }
           } catch (e) {
-            // Ignorar
+            console.log('Parse error on line:', line); // Debug
           }
         }
       }
@@ -43,7 +45,7 @@ function callTool(serverProcess, toolName, args = {}, requestId) {
     setTimeout(() => {
       serverProcess.stdout.removeListener('data', onData);
       reject(new Error('Timeout'));
-    }, 10000); // Aumentar timeout para exec tools
+    }, 10000);
   });
 }
 
@@ -57,7 +59,31 @@ const toolsToTest = [
   { name: 'ai_study', args: { study_type: 'research', topic: 'MCP Protocol', sources: ['source1', 'source2'] } },
   { name: 'ai_visualize', args: { viz_type: 'flowchart', data: { nodes: ['start', 'end'] } } },
   { name: 'ai_think', args: { think_type: 'deductive', premise: 'All MCP tools work.' } },
-  { name: 'cognitive_checkpoint', args: { query: 'Test full cycle' } }
+  { name: 'cognitive_checkpoint', args: { query: 'Test full cycle' } },
+  { name: 'ai_vision', args: { 
+    messages: [
+      {
+        role: "user",
+        content: [
+          {
+            type: "text",
+            text: "What is in this image?"
+          },
+          {
+            type: "image_url",
+            image_url: {
+              url: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg"
+            }
+          }
+        ]
+      }
+    ],
+    model: "x-ai/grok-4-fast:free"
+  } },
+  { name: 'get_garou_instructions', args: {} },
+  { name: 'ai_identity', args: {} },
+  // Adicionar ao final para teste de pergunta
+  { name: 'cognitive_checkpoint', args: { query: 'Como Garou v7.0 gerencia um projeto de AI?' } }
 ];
 
 // Iniciar servidor
@@ -88,7 +114,9 @@ async function initialize() {
   return new Promise((resolve, reject) => {
     let buffer = '';
     const onData = (data) => {
-      buffer += data.toString();
+      const chunk = data.toString();
+      console.log('Raw init output:', chunk); // Debug
+      buffer += chunk;
       const lines = buffer.split('\n');
       buffer = lines.pop() || '';
       for (const line of lines) {
@@ -99,7 +127,9 @@ async function initialize() {
               serverProcess.stdout.removeListener('data', onData);
               resolve(response);
             }
-          } catch (e) {}
+          } catch (e) {
+            console.log('Init parse error:', line);
+          }
         }
       }
     };
